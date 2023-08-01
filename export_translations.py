@@ -24,13 +24,17 @@ for lang in languages:
         for path in listdir:
             with open("{}/{}".format(filePath, path)) as file_handler:
                 print(file_handler.name)
-                lines = file_handler.readlines()
-                joined_lines = str("\n".join(lines))
 
-                # joined_lines = joined_lines.split("<body>")[1]
-                # joined_lines = joined_lines.split("</body>")[0]
-                # joined_lines = joined_lines.strip("\n ")
-                # joined_lines = joined_lines.replace("\n", "")
-                # joined_lines = joined_lines.replace("<br>", "")
+                try:
+                    lines = file_handler.readlines()
+                    joined_lines = str("\n".join(lines))
 
-                writer.writerow([path, joined_lines])
+                    # joined_lines = joined_lines.split("<body>")[1]
+                    # joined_lines = joined_lines.split("</body>")[0]
+                    # joined_lines = joined_lines.strip("\n ")
+                    # joined_lines = joined_lines.replace("\n", "")
+                    # joined_lines = joined_lines.replace("<br>", "")
+
+                    writer.writerow([path, joined_lines])
+                except:
+                    print("Skipped file " + file_handler.name)
