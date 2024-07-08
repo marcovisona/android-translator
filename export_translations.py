@@ -4,6 +4,8 @@ import re
 import sys
 from pathlib import Path
 
+from util import convert_to_excel
+
 base_path = sys.argv[1]
 outputFilepath = sys.argv[2]
 print(base_path)
@@ -14,7 +16,8 @@ for lang in languages:
 
     os.makedirs(outputFilepath, exist_ok=True)
 
-    with open('{}/{}.csv'.format(outputFilepath, lang.name), mode='w') as out_lang_file:
+    csv_file = '{}/{}.csv'.format(outputFilepath, lang.name)
+    with open(csv_file, mode='w') as out_lang_file:
         writer = csv.writer(out_lang_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         print(out_lang_file.name)
 
@@ -27,7 +30,7 @@ for lang in languages:
 
                 try:
                     lines = file_handler.readlines()
-                    joined_lines = str("\n".join(lines))
+                    joined_lines = str("".join(lines))
 
                     # joined_lines = joined_lines.split("<body>")[1]
                     # joined_lines = joined_lines.split("</body>")[0]
@@ -38,3 +41,9 @@ for lang in languages:
                     writer.writerow([path, joined_lines])
                 except:
                     print("Skipped file " + file_handler.name)
+
+# Loop through all CSV files in the directory
+for csv_file in Path(outputFilepath).glob('*.csv'):
+    convert_to_excel(csv_file)
+
+

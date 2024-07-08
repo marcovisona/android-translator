@@ -23,9 +23,12 @@ THE SOFTWARE.
 """
 import os
 import sys
+from pathlib import Path
 from xml.dom import minidom
 from OrderedSet import OrderedSet
 import csv
+
+from util import convert_to_excel
 
 
 def export_to_csv(data, filename):
@@ -52,7 +55,7 @@ def unescapeAndroidChar(text):
     return text
 
 
-defaultLangage = 'en'  # raw_input("Default langage ISO-639-1 code. (write en if your default langage is english):")
+default_language = 'en'  # raw_input("Default langage ISO-639-1 code. (write en if your default langage is english):")
 pathToProject = sys.argv[1]  # raw_input("Path to Android project file:")
 outputFilepath = sys.argv[2]  # raw_input("Path to CSV file (output):")
 
@@ -66,7 +69,7 @@ for f in folderList:
             index = f.index("-")
             lang = f[index + 1:]
         except:
-            lang = defaultLangage
+            lang = default_language
         print(lang)
 
         langageDict[lang] = dict()
@@ -138,3 +141,10 @@ for key in uniqueKeys:
     data.append(elements)
 
 export_to_csv(data, outputFilepath)
+
+# print("Path(outputFilepath)", Path(outputFilepath))
+# exit(1)
+# # Loop through all CSV files in the directory
+convert_to_excel(Path(outputFilepath))
+
+
