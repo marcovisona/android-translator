@@ -85,8 +85,8 @@ def read_file(file_name):
 
 
 # 1) Read the file and build dictionnary for each langage
-langageExportDict = read_file(pathToExportString)
-# langageDict = read_file(pathToString)
+languageExportDict = read_file(pathToExportString)
+# languageDict = read_file(pathToString)
 
 # 2) Create an XML document from each langage dictionnary
 xmldict = dict()
@@ -117,9 +117,9 @@ def add(collection):
                 rootNode.appendChild(node)
 
 
-for lang in langageExportDict:
-    stringsDict = collections.OrderedDict(langageExportDict[lang])
-    stringsExportDict = langageExportDict[lang]
+for lang in languageExportDict:
+    stringsDict = collections.OrderedDict(languageExportDict[lang])
+    stringsExportDict = languageExportDict[lang]
     doc = minidom.Document()
     xmldict[lang] = doc
     rootNode = doc.createElement("resources")
@@ -141,7 +141,7 @@ for lang in langageExportDict:
     add(stringsDict)
 
 # 3) Write XML for each langage in the correct directory structure
-for lang in langageExportDict:
+for lang in languageExportDict:
     folderName = "values"
     if lang != defaultLanguage:
         folderName = "values-" + lang
