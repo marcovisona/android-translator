@@ -1,34 +1,10 @@
-"""
-The MIT License (MIT)
-
-Copyright (c) 2014 Jean-Philippe Jodoin
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-"""
-
 import codecs
 import collections
 import csv
 import os
 import sys
 from xml.dom import minidom
-
+import openpyxl
 
 def escapeAndroidChar(text):
     text = text.replace('\'', "\\'")
@@ -46,6 +22,30 @@ defaultLanguage = "en"
 
 outputFolder = os.path.join(outputFolder, "res")
 
+
+def read_xlsx(filename):
+    content = dict()
+    wb = openpyxl.load_workbook(filename)
+    sheet = wb.active
+    rows = list(sheet.iter_rows(values_only=True))
+
+    if len(rows) <= 0:
+        return content
+
+    header_tmp = rows[0]
+    langList = []
+    for lang in header_tmp[1:]:
+        if lang:
+            content[lang] = dict()
+            langList.append(lang)
+    for l in rows[1:]:
+        key = l[0]
+        for idx, item in enumerate(l[1:]):
+            if item:
+                content[langList[idx]][key] = escapeAndroidChar(item)
+            else:
+                print("Empty item for " + langList[idx])
+    return content
 
 def read_csv(filename):
     # Open the CSV file in read mode
@@ -83,12 +83,8 @@ def read_file(file_name):
                 print("Empty item for " + langList[idx])
     return content
 
-
-# 1) Read the file and build dictionnary for each langage
-languageExportDict = read_file(pathToExportString)
-# languageDict = read_file(pathToString)
-
-# 2) Create an XML document from each langage dictionnary
+languageExportDict = read_xlsx(pathToExportString)
+# languageExportDict = read_file(pathToExportString)
 xmldict = dict()
 
 

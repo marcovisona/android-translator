@@ -39,10 +39,10 @@ fi
 PROJECT_NAME=$(basename "$PROJECT_PATH")
 CSV_PATH="out/$PROJECT_NAME"
 
-python3 csv2androidproject.py $CSV_PATH/libutilities.csv $PROJECT_PATH/libutilities/src/main/
-python3 csv2androidproject.py $CSV_PATH/libdata.csv $PROJECT_PATH/libdata/src/main/
-python3 csv2androidproject.py $CSV_PATH/libcomm.csv $PROJECT_PATH/libcomm/src/main/
-python3 csv2androidproject.py $CSV_PATH/libstate.csv $PROJECT_PATH/libstate/src/main/
-python3 csv2androidproject.py $CSV_PATH/libui.csv $PROJECT_PATH/libui/src/main/
+python3 csv2androidproject.py $CSV_PATH/libutilities.xlsx $PROJECT_PATH/libutilities/src/main/
+python3 csv2androidproject.py $CSV_PATH/libdata.xlsx $PROJECT_PATH/libdata/src/main/
+python3 csv2androidproject.py $CSV_PATH/libcomm.xlsx $PROJECT_PATH/libcomm/src/main/
+python3 csv2androidproject.py $CSV_PATH/libstate.xlsx $PROJECT_PATH/libstate/src/main/
+python3 csv2androidproject.py $CSV_PATH/libui.xlsx $PROJECT_PATH/libui/src/main/
 
-python3 csv2androidproject.py $CSV_PATH/laser.csv $PROJECT_PATH/$PROJECT_MODULE/src/main/
+python3 csv2androidproject.py $CSV_PATH/laser.xlsx $PROJECT_PATH/$PROJECT_MODULE/src/main/
