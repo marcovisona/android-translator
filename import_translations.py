@@ -1,62 +1,44 @@
-import csv
+import sys
+from pathlib import Path
+
+import pandas as pd
 import os
 import re
-from typing import Dict
 
-header = """<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <link rel="stylesheet" type="text/css" href="../style.css">
-</head>
 
-<body>
-"""
-footer = """
-</body>
-</html>
-"""
+def convert_excel_to_html(excel_file, output_dir):
+    # Read the Excel file
+    df = pd.read_excel(excel_file, sheet_name=None)
 
-base_path = 'html_doctorvet2'
-languages = ['en', 'es', 'fr', 'it']
+    # Create the output directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
 
-assoc = {}
-with open('files/assoc.csv') as csv_file:
-    csv_reader = csv.reader(csv_file, delimiter=';')
-    line_count = 0
-    for row in csv_reader:
-        assoc[row[0]] = {
-            'to': row[1],
-            'additional': row[3]
-        }
+    for sheet_name, data in df.items():
+        for index, row in data.iterrows():
+            file_name = row.iloc[0]
+            content = row.iloc[1]
 
-errors = []
+            # Reconstruct the HTML content
+            content = re.sub(r'\\n', '\n', content)
+            content = re.sub(r'\\t', '\t', content)
+            content = re.sub(r'\\r', '\r', content)
+
+            html_content = content
+
+            # Write the HTML content to a file
+            with open(os.path.join(output_dir, file_name), 'w') as html_file:
+                html_file.write(html_content)
+
+
+# Example usage
+excel_files = sys.argv[1]
+output_dir = sys.argv[2]
+
+languages = [item.stem for item in Path(excel_files).iterdir() if item.name.endswith('.xlsx')]
+
 for lang in languages:
-
-    translations = {}
-    with open('files/{}.csv'.format(lang)) as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=';')
-        line_count = 0
-        for row in csv_reader:
-            translations[row[0]] = row[1]
-
-    filePath = "{}/{}".format(base_path, lang)
-    # listdir = sorted([x for x in os.listdir(filePath) if re.match(r'.*\.html', x)])
-
-    for (file, val) in assoc.items():
-        try:
-            transl = translations[assoc[file]['to']]
-            with open("{}/{}".format(filePath, file), 'w') as f:
-                f.write(header)
-                f.write(transl.replace(" ", "<br>\n"))
-                f.write('<br>\n')
-                additional = assoc[file]['additional']
-                if additional:
-                    f.write(translations[additional].replace(" ", "<br>\n"))
-                    f.write('<br>\n')
-                f.write(footer)
-        except Exception as e:
-            errors.append(assoc[file]['to'])
-
-if errors:
-    print("Error importing:\n{}".format("\n".join(set(errors))))
+    excel_file = '{}/{}.xlsx'.format(excel_files, lang)
+    output_directory = '{}/{}'.format(output_dir, lang)
+    print('excel_file ' + excel_file)
+    print('output_directory ' + output_directory)
+    convert_excel_to_html(excel_file, output_directory)
