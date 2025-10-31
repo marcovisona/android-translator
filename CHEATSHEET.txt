@@ -19,19 +19,19 @@ poetry run android-translator --help
 📤 EXPORT (Android → Excel)
 ────────────────────────────────────────────────────────────────────
 poetry run android-translator strings export \
-    /path/to/project/module/src/main \
-    output.xlsx
+    /path/to/android/project
 
 Options:
+  --output-dir DIR           Output directory (default: out)
   --default-language LANG    Default language (default: en)
 
 📥 IMPORT (Excel → Android)
 ────────────────────────────────────────────────────────────────────
 poetry run android-translator strings import \
-    output.xlsx \
-    /path/to/project/module/src/main
+    /path/to/android/project
 
 Options:
+  --output-dir DIR           Input directory (default: out)
   --default-language LANG    Default language (default: en)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -42,24 +42,24 @@ Options:
 ────────────────────────────────────────────────────────────────────
 poetry run android-translator html export \
     /path/to/project/module/src/main/assets/html \
-    output_dir
+    --output-dir output_dir
 
 Options:
-  --keep-html-tags    Keep HTML tags (default: remove)
+  --remove-html-tags    Remove HTML tags (default: keep)
 
 📥 IMPORT (Excel → HTML)
 ────────────────────────────────────────────────────────────────────
 poetry run android-translator html import \
-    output_dir \
-    /path/to/project/module/src/main/assets/html
+    /path/to/project/module/src/main/assets/html \
+    --output-dir output_dir
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   TYPICAL WORKFLOW
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. Export:   poetry run android-translator strings export <src> <out.xlsx>
-2. Translate: Edit out.xlsx in Excel
-3. Import:   poetry run android-translator strings import <out.xlsx> <src>
+1. Export:   poetry run android-translator strings export /path/to/project
+2. Translate: Edit Excel files in out/project-name/module-name/
+3. Import:   poetry run android-translator strings import /path/to/project
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   HELP COMMANDS

@@ -5,8 +5,8 @@ description = "A unified CLI tool for managing translations in Android projects 
 authors = ["Jean-Philippe Jodoin", "Contributors"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/yourusername/android-strings-to-csv"
-repository = "https://github.com/yourusername/android-strings-to-csv"
+homepage = "https://github.com/marcovisona/android-translator"
+repository = "https://github.com/marcovisona/android-translator"
 keywords = ["android", "translation", "i18n", "l10n", "strings", "excel"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
