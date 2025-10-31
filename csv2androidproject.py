@@ -11,6 +11,38 @@ def escapeAndroidChar(text):
     return text
 
 
+def get_original_key_order(xml_file_path):
+    """
+    Read the existing XML file and extract the order of keys (both regular strings and arrays).
+    Returns an ordered list of keys as they appear in the original XML.
+    """
+    if not os.path.exists(xml_file_path):
+        return []
+    
+    key_order = []
+    try:
+        xmldoc = minidom.parse(xml_file_path)
+        rootNode = xmldoc.getElementsByTagName("resources")
+        if len(rootNode) == 1:
+            nodeList = rootNode[0].childNodes
+            for n in nodeList:
+                if hasattr(n, 'attributes') and n.attributes is not None:
+                    tag = n.tagName
+                    if tag == 'string':
+                        key = n.attributes['name'].nodeValue
+                        key_order.append(key)
+                    elif tag == 'string-array':
+                        name = n.attributes['name'].nodeValue
+                        itemList = n.getElementsByTagName("item")
+                        for idx in range(len(itemList)):
+                            key = str(name) + "," + str(idx)
+                            key_order.append(key)
+    except Exception as e:
+        print(f"Warning: Could not read original XML file {xml_file_path}: {e}")
+    
+    return key_order
+
+
 # pathToString = raw_input("Path to CSV file:")
 # outputFolder = raw_input("Path to Android project (output):")
 # defaultLanguage = raw_input("Default langage ISO-639-1 code. (write en if your default langage is english):")
@@ -93,27 +125,55 @@ def load_strings_arr(lang):
         return [x.strip("\n") for x in f.readlines()]
 
 
-def add(collection):
-    for key in collection:
+def add(collection, is_ordered=False):
+    """
+    Add string elements to the XML document.
+    
+    Args:
+        collection: Either a dict or a list of keys to process
+        is_ordered: If True, collection is a list of keys in specific order.
+                   If False, collection is a dict to iterate over.
+    """
+    if is_ordered:
+        # collection is a list of keys in the desired order
+        keys_to_process = collection
+    else:
+        # collection is a dict, iterate over its keys
+        keys_to_process = collection
+    
+    current_array_node = None
+    current_array_name = None
+    
+    for key in keys_to_process:
         if key is None:
             continue
 
-        if ',' in key:
-            if ',0' in key:  # first node. Order is guaranteed by the sort
-                topNode = doc.createElement("string-array")
-                topNode.setAttribute("name", key[0:key.find(',0')])
-                rootNode.appendChild(topNode)
+        # Check if this key exists in stringsDict
+        if not stringsDict.get(key):
+            continue
 
-            if stringsDict.get(key):
-                node = doc.createElement("item")
-                node.appendChild(doc.createTextNode(stringsDict[key]))
-                topNode.appendChild(node)
+        if ',' in key:
+            # This is a string-array item
+            array_name = key[:key.rfind(',')]
+            
+            # If this is a new array or the first item (,0), create the array node
+            if current_array_name != array_name:
+                current_array_node = doc.createElement("string-array")
+                current_array_node.setAttribute("name", array_name)
+                rootNode.appendChild(current_array_node)
+                current_array_name = array_name
+            
+            # Add item to the current array
+            node = doc.createElement("item")
+            node.appendChild(doc.createTextNode(stringsDict[key]))
+            current_array_node.appendChild(node)
         else:
-            if stringsDict.get(key):
-                node = doc.createElement("string")
-                node.setAttribute("name", key)
-                node.appendChild(doc.createTextNode(stringsDict[key]))
-                rootNode.appendChild(node)
+            # Regular string element
+            current_array_name = None  # Reset array tracking
+            node = doc.createElement("string")
+            node.setAttribute("name", key)
+            node.appendChild(doc.createTextNode(stringsDict[key]))
+            rootNode.appendChild(node)
 
 
 for lang in languageExportDict:
@@ -124,20 +184,32 @@ for lang in languageExportDict:
     rootNode = doc.createElement("resources")
     doc.appendChild(rootNode)
 
-    # stringsExportDict = collections.OrderedDict((stringsExportDict.items()))
-    # stringsDict = collections.OrderedDict((stringsDict.items()))
-    # stringsExportDict = stringsExportDict.items()
-    # stringsDict = stringsDict.items()
-
-    stringsArr = list(stringsDict.values())
-
-    add(stringsArr)
-
-    for key in stringsArr:
-        if stringsDict.get(key):
-            stringsDict.pop(key)
-
-    add(stringsDict)
+    # Determine the output path for this language to read original ordering
+    folderName = "values" if lang == defaultLanguage else "values-" + lang
+    langFolder = os.path.join(outputFolder, folderName)
+    stringPath = os.path.join(langFolder, "strings.xml")
+    
+    # Get the original key order from the existing XML file
+    original_key_order = get_original_key_order(stringPath)
+    
+    # Separate keys into: existing (in original order) and new (not in original XML)
+    existing_keys = []
+    new_keys = []
+    
+    for key in stringsDict.keys():
+        if key in original_key_order:
+            existing_keys.append(key)
+        else:
+            new_keys.append(key)
+    
+    # Sort existing keys by their original position
+    existing_keys.sort(key=lambda k: original_key_order.index(k))
+    
+    # Add existing keys first (preserving original order)
+    add(existing_keys, is_ordered=True)
+    
+    # Add new keys at the end (in the order they appear in CSV)
+    add(new_keys, is_ordered=True)
 
 # 3) Write XML for each langage in the correct directory structure
 for lang in languageExportDict:
