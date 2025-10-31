@@ -1,72 +1,59 @@
-# Android Strings Translation Tool - AI Instructions
+# Copilot Instructions for android-translator
 
 ## Project Overview
-This is a Python-based tool for converting Android string resources between XML and CSV/Excel formats to facilitate translation workflows. The codebase handles two distinct workflows: XML string translations and HTML content translations.
+- **Purpose:** Unified CLI for exporting/importing Android `strings.xml` and HTML translations to/from Excel (CSV/XLSX), streamlining workflows with translators.
+- **Main Entrypoint:** `android_translator.py` (CLI), with subcommands for `strings` and `html` export/import.
+- **Command Modules:** Located in `commands/` (e.g., `strings_export.py`, `html_import.py`). Utilities in `commands/utils/`.
 
 ## Architecture & Data Flow
+- **CLI Structure:** All commands are routed through `android_translator.py`, which dispatches to modules in `commands/`.
+- **Subcommands:** Each subcommand (e.g., `strings export`, `html import`) is a separate module, responsible for argument parsing, file I/O, and calling shared utilities.
+- **Order Preservation:** String order is maintained using a custom `OrderedSet` (`commands/utils/OrderedSet.py`).
+- **Data Flow:**
+  - Reads Android `strings.xml` and HTML files
+  - Exports to Excel/CSV (`out/<project>/<module>/<module>.xlsx`)
+  - Imports update original files from translated Excel/CSV
+  - Non-translatable strings are preserved; missing translations are reported
 
-### Core Components
-- **androidproject2csv.py**: Extracts strings from multiple `values-{lang}/strings.xml` files → single CSV/Excel
-- **csv2androidproject.py**: Converts CSV/Excel back → multiple `values-{lang}/strings.xml` files  
-- **export_translations.py + export_html.sh**: Extracts HTML content → CSV per language
-- **import_translations.py + import_html.sh**: Converts CSV back → HTML files
+## Developer Workflows
+- **Install:** Use Poetry (`poetry install`).
+- **Run CLI:** `poetry run android-translator <command> <subcommand> [options]`
+- **Test:** `poetry run python test_android_translator.py`
+- **Debug:** Add print/log statements; CLI errors are surfaced in terminal output.
 
-### Key Data Structures
-- `langageDict[lang][key] = value` - Main translation storage (note: "langage" spelling is intentional)
-- `OrderedSet` - Custom implementation preserving string key order for consistent CSV output
-- XML parsing uses `minidom` with specific handling for `<string>` and `<string-array>` elements
+## Conventions & Patterns
+- **CSV Separator:** Tab (`\t`) is used for CSV files. Avoid tabs in string values.
+- **Excel Format:** Output files are `.xlsx` (via pandas/openpyxl). Columns: key, language codes.
+- **Module Discovery:** Project modules are auto-discovered by searching for `res/values/` directories.
+- **Utilities:** Shared logic in `commands/utils/` (XML parsing, file I/O, order preservation).
+- **Safe Import:** Always preserve string order and non-translatable entries.
 
-## Critical Patterns
+## Integration Points
+- **External Dependencies:**
+  - `pandas`, `openpyxl` for Excel/CSV handling
+  - Poetry for dependency management
+- **No network calls or external APIs**; all processing is local file I/O.
 
-### String Handling
-- **Escape/Unescape**: `escapeAndroidChar()` converts `'` ↔ `\'` for Android XML compatibility
-- **Translatable filtering**: Respects `translatable="false"` attribute in XML
-- **Array handling**: String arrays become `"array_name,index"` keys in CSV
+## Key Files & Directories
+- `android_translator.py`: Main CLI
+- `commands/`: Subcommand implementations
+- `commands/utils/`: Shared utilities (e.g., `OrderedSet.py`, `util.py`)
+- `test_android_translator.py`: Test suite
+- `README.md`: Usage, workflow, and troubleshooting
 
-### File Structure Expectations
-```
-Android Project/
-├── res/
-│   ├── values/strings.xml          # Default language (en)
-│   ├── values-fr/strings.xml       # French
-│   └── values-es/strings.xml       # Spanish
-HTML Project/
-├── module/src/main/assets/html/
-│   ├── en/file1.html, file2.html
-│   └── fr/file1.html, file2.html
-```
-
-### Command Line Usage
+## Example Workflow
 ```bash
-# XML workflow
-python3 androidproject2csv.py /path/to/android/project output.csv
-python3 csv2androidproject.py input.xlsx /path/to/android/project
-
-# HTML workflow  
-./export_html.sh -m module_name /path/to/project
-./import_html.sh -m module_name /path/to/project
+poetry run android-translator strings export /path/to/project
+# Edit Excel files
+poetry run android-translator strings import /path/to/project
 ```
 
-## Development Conventions
+## Tips for AI Agents
+- Use Poetry for builds/tests unless user requests otherwise.
+- Reference `README.md` for command details and troubleshooting.
+- When adding new commands, follow the pattern in `commands/` and update CLI help.
+- Always preserve string order and non-translatable entries.
 
-### CSV Format
-- Tab-separated by default (configurable in scripts)
-- First column: string keys (including `array_name,index` for arrays)
-- Subsequent columns: language codes (en, fr, es, etc.)
-- Auto-converts to Excel (.xlsx) via `util.py`
+---
 
-### Error Handling
-- Prints warnings for missing translations: `"Undefined string for key {key} in {lang}"`
-- Gracefully skips non-translatable strings and malformed XML
-- Uses try/except for file operations without stopping execution
-
-### Dependencies
-- `xml.dom.minidom` for XML parsing (built-in)
-- `pandas` + `openpyxl` for Excel conversion
-- `OrderedSet.py` - custom ordered set implementation
-- Shell scripts expect `python3` in PATH
-
-## Module-Specific Notes
-- HTML extraction removes all tags via regex: `re.sub('<[^<]+?>', '', content)`
-- Default language assumption: `en` (hardcoded in multiple places)
-- Module structure supports different Android project layouts via `-m module_name` parameter
+_Review these instructions for accuracy. If any section is unclear or missing, please provide feedback to improve._
