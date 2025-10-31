@@ -1,3 +1,4 @@
+import argparse
 import sys
 from pathlib import Path
 
@@ -30,9 +31,15 @@ def convert_excel_to_html(excel_file, output_dir):
                 html_file.write(html_content)
 
 
-# Example usage
-excel_files = sys.argv[1]
-output_dir = sys.argv[2]
+# Parse command line arguments
+parser = argparse.ArgumentParser(description='Import translations from Excel files to HTML')
+parser.add_argument('excel_files', help='Directory containing Excel files with translations')
+parser.add_argument('output_dir', help='Output directory for HTML files')
+
+args = parser.parse_args()
+
+excel_files = args.excel_files
+output_dir = args.output_dir
 
 languages = [item.stem for item in Path(excel_files).iterdir() if item.name.endswith('.xlsx')]
 

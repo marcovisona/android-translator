@@ -95,6 +95,9 @@ def load_strings_arr(lang):
 
 def add(collection):
     for key in collection:
+        if key is None:
+            continue
+
         if ',' in key:
             if ',0' in key:  # first node. Order is guaranteed by the sort
                 topNode = doc.createElement("string-array")

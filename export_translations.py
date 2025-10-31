@@ -1,13 +1,23 @@
+import argparse
 import csv
 import os
 import re
-import sys
 from pathlib import Path
 
 from util import convert_to_excel
 
-base_path = sys.argv[1]
-outputFilepath = sys.argv[2]
+parser = argparse.ArgumentParser(description='Export HTML translations to CSV')
+parser.add_argument('base_path', help='Base path containing language directories')
+parser.add_argument('output_filepath', help='Output directory for CSV files')
+parser.add_argument('--keep-html-tags', action='store_true', 
+                    help='Keep HTML tags in the exported content (default: remove tags)')
+
+args = parser.parse_args()
+
+base_path = args.base_path
+outputFilepath = args.output_filepath
+keep_html_tags = args.keep_html_tags
+
 print(base_path)
 print(outputFilepath)
 languages = [item for item in Path(base_path).iterdir() if item.is_dir()]
@@ -31,6 +41,13 @@ for lang in languages:
                 try:
                     lines = file_handler.readlines()
                     joined_lines = str("".join(lines))
+
+                    # Remove html tags (unless --keep-html-tags is specified)
+                    if not keep_html_tags:
+                        joined_lines = re.sub('<[^<]+?>', '', joined_lines)
+
+                    # trim leading and trailing whitespaces and other invisible characters
+                    joined_lines = joined_lines.strip()
 
                     # joined_lines = joined_lines.split("<body>")[1]
                     # joined_lines = joined_lines.split("</body>")[0]

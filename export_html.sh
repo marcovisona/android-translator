@@ -38,4 +38,4 @@ fi
 
 PROJECT_NAME=$(basename "$PROJECT_PATH")
 
-python3 export_translations.py $PROJECT_PATH/$PROJECT_MODULE/src/main/assets/html html/$PROJECT_NAME
+python3 export_translations.py $PROJECT_PATH/$PROJECT_MODULE/src/main/assets/html html/$PROJECT_NAME --keep-html-tags
