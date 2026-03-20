@@ -300,6 +300,7 @@ poetry run android-translator html import <html_path> [--output-dir OUTPUT_DIR]
 **Arguments:**
 - `html_path`: Path to HTML directory containing language folders (must match the path used for export)
 - `--output-dir`: (Optional) Directory containing exported Excel files (default: `out`)
+- `--plain-text-to-html`: (Optional) Treat imported content as plain text and wrap each line in a `<p>` tag
 
 **Example:**
 ```bash
@@ -311,12 +312,18 @@ poetry run android-translator html import \
 poetry run android-translator html import \
     ~/projects/MyApp/app/src/main/assets/html \
     --output-dir translations
+
+# Convert plain text to HTML paragraphs during import
+poetry run android-translator html import \
+    ~/projects/MyApp/app/src/main/assets/html \
+    --plain-text-to-html
 ```
 
 **What it does:**
 - Reads Excel files (one per language) from `output-dir/project-name/html/`
 - Recreates HTML files in language subdirectories
 - Handles escaped characters (newlines, tabs, etc.)
+- Optionally converts plain text into HTML by wrapping each line in `<p>...</p>`
 
 ---
 

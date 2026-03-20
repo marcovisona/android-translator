@@ -38,6 +38,9 @@ Examples:
   
   # Import HTML translations
   %(prog)s html import /path/to/project/module/src/main/assets/html
+
+  # Import plain text translations and wrap each line in <p> tags
+  %(prog)s html import /path/to/project/module/src/main/assets/html --plain-text-to-html
   
 For more information, see README.md
         """
@@ -168,6 +171,11 @@ For more information, see README.md
         type=Path,
         default=Path('out'),
         help='Directory containing exported Excel files (default: out). Expected structure: output-dir/project/html/'
+    )
+    html_import_parser.add_argument(
+        '--plain-text-to-html',
+        action='store_true',
+        help='Wrap each plain-text line in a <p> tag when generating HTML files'
     )
     html_import_parser.set_defaults(func=html_import.execute)
     

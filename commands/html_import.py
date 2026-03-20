@@ -1,13 +1,37 @@
 """
 Import Excel translations back to HTML files.
 """
+from html import escape
 import os
 import re
 
 import pandas as pd
 
 
-def convert_excel_to_html(excel_file, output_dir):
+def normalize_excel_content(content):
+    """Normalize Excel cell content and unescape supported control characters."""
+    if pd.isna(content):
+        return ""
+
+    normalized_content = str(content)
+    normalized_content = re.sub(r'\\n', '\n', normalized_content)
+    normalized_content = re.sub(r'\\t', '\t', normalized_content)
+    normalized_content = re.sub(r'\\r', '\r', normalized_content)
+
+    return normalized_content
+
+
+def wrap_plain_text_lines_in_paragraphs(content):
+    """Convert plain text lines to HTML paragraphs."""
+    lines = content.splitlines()
+
+    if not lines:
+        return ""
+
+    return "\n".join(f"<p>{escape(line)}</p>" for line in lines)
+
+
+def convert_excel_to_html(excel_file, output_dir, plain_text_to_html=False):
     """
     Convert Excel file to HTML files.
     
@@ -22,16 +46,14 @@ def convert_excel_to_html(excel_file, output_dir):
     os.makedirs(output_dir, exist_ok=True)
     
     for sheet_name, data in df.items():
-        for index, row in data.iterrows():
+        for _, row in data.iterrows():
             file_name = row.iloc[0]
-            content = row.iloc[1]
-            
-            # Handle escaped characters
-            content = re.sub(r'\\n', '\n', str(content))
-            content = re.sub(r'\\t', '\t', content)
-            content = re.sub(r'\\r', '\r', content)
-            
+            content = normalize_excel_content(row.iloc[1])
+
             html_content = content
+
+            if plain_text_to_html:
+                html_content = wrap_plain_text_lines_in_paragraphs(content)
             
             # Write the HTML content to a file
             output_file = os.path.join(output_dir, file_name)
@@ -43,6 +65,7 @@ def execute(args):
     """Execute the HTML import command."""
     html_path = args.html_path
     output_dir = args.output_dir
+    plain_text_to_html = args.plain_text_to_html
     
     # Validate HTML path
     if not html_path.exists():
@@ -75,6 +98,7 @@ def execute(args):
     
     print(f"📥 Importing from: {input_dir}")
     print(f"📁 Target HTML directory: {html_path}")
+    print(f"📝 Plain text to HTML: {plain_text_to_html}")
     print()
     
     # Get all Excel files (language files)
@@ -91,7 +115,11 @@ def execute(args):
         output_directory = html_path / lang
         
         try:
-            convert_excel_to_html(excel_file, output_directory)
+            convert_excel_to_html(
+                excel_file,
+                output_directory,
+                plain_text_to_html=plain_text_to_html,
+            )
             
             # Count HTML files created
             html_files = list(output_directory.glob('*.html'))
