@@ -1,12 +1,13 @@
-[tool.poetry]
+[project]
 name = "android-translator"
 version = "2.0.0"
 description = "A unified CLI tool for managing translations in Android projects (strings.xml and HTML files)"
-authors = ["Jean-Philippe Jodoin", "Contributors"]
+authors = [
+    { name = "Marco Visonà" },
+]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/marcovisona/android-translator"
-repository = "https://github.com/marcovisona/android-translator"
+requires-python = ">=3.12,<4.0"
 keywords = ["android", "translation", "i18n", "l10n", "strings", "excel"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -18,17 +19,20 @@ classifiers = [
     "Topic :: Software Development :: Internationalization",
     "Topic :: Software Development :: Localization",
 ]
+dependencies = [
+    "pandas>=2.0.0,<3.0.0",
+    "openpyxl>=3.0.0,<4.0.0",
+]
 
-[tool.poetry.dependencies]
-python = "^3.12"
-pandas = "^2.0.0"
-openpyxl = "^3.0.0"
+[project.urls]
+homepage = "https://github.com/marcovisona/android-translator"
+repository = "https://github.com/marcovisona/android-translator"
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^7.0.0"
-
-[tool.poetry.scripts]
+[project.scripts]
 android-translator = "android_translator:main"
+
+[dependency-groups]
+dev = ["pytest>=7.0.0,<8.0.0"]
 
 [build-system]
 requires = ["poetry-core"]

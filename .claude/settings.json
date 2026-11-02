@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs -I{} echo {})",
+      "Bash(poetry --version)",
+      "Bash(uv --version)",
+      "Bash(uv lock *)",
+      "Bash(uv run *)",
+      "Bash(uv sync *)",
+      "Bash(python3 -c ' *)"
+    ]
+  }
+}

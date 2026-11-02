@@ -3,6 +3,7 @@ out
 output
 
 venv
+.venv
 
 # Compiled Python bytecode
 *.py[cod]
