@@ -15,6 +15,7 @@ A unified command-line tool for managing translations in Android projects. Expor
 - [Installation](#-installation)
   - [Using Poetry (Recommended)](#using-poetry-recommended)
   - [Using pip](#alternative-using-pip)
+- [Graphical Interface](#-graphical-interface)
 - [Usage](#-usage)
   - [Export Android Strings](#1-export-android-strings-to-excel)
   - [Import Android Strings](#2-import-excel-to-android-strings)
@@ -125,6 +126,25 @@ poetry run android-translator --help
 poetry shell
 android-translator --help
 ```
+
+---
+
+## 🖥️ Graphical Interface
+
+A small Tkinter window runs the same four commands, without having to remember them:
+
+```bash
+# From this repository
+uv run android-translator-gui
+
+# Or install it once and launch it from anywhere
+uv tool install .
+android-translator-gui
+```
+
+Pick a command and the folders, then press **Run**. The window remembers your choices in `~/.android_translator_gui.json`. The Excel folder is the CLI's `--output-dir`.
+
+On Linux, a system Python may also need the `python3-tk` package.
 
 ---
 

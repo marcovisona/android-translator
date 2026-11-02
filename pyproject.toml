@@ -31,6 +31,16 @@ repository = "https://github.com/marcovisona/android-translator"
 [project.scripts]
 android-translator = "android_translator:main"
 
+[project.gui-scripts]
+android-translator-gui = "android_translator_gui:main"
+
+[tool.poetry]
+packages = [
+    { include = "commands" },
+    { include = "android_translator.py" },
+    { include = "android_translator_gui.py" },
+]
+
 [dependency-groups]
 dev = ["pytest>=7.0.0,<8.0.0"]
 
